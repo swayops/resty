@@ -64,7 +64,7 @@ func cmpMap(am, bm map[string]interface{}) error {
 		case map[string]interface{}:
 			if v, ok := v.(map[string]interface{}); ok {
 				if err := cmpMap(ov, v); err != nil {
-					return nil
+					return fmt.Errorf("%s: %v", k, err)
 				}
 			} else {
 				return fmt.Errorf("%s: type mismatch %T vs %T", k, am[k], bm[k])
