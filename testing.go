@@ -54,9 +54,25 @@ func compareRes(a, b []byte) error {
 		return fmt.Errorf("%s: %v", b, err)
 	}
 
+	return cmpMap(am, bm)
+}
+
+func cmpMap(am, bm map[string]interface{}) error {
 	for k, v := range bm {
-		if ov := am[k]; !reflect.DeepEqual(v, ov) {
-			return fmt.Errorf("%s wanted %v, got %v", k, v, ov)
+		ov := am[k]
+		switch ov := ov.(type) {
+		case map[string]interface{}:
+			if v, ok := v.(map[string]interface{}); ok {
+				if err := cmpMap(ov, v); err != nil {
+					return nil
+				}
+			} else {
+				return fmt.Errorf("%s: type mismatch %T vs %T", k, am[k], bm[k])
+			}
+		default:
+			if !reflect.DeepEqual(v, ov) {
+				return fmt.Errorf("%s wanted %v, got %v", k, v, ov)
+			}
 		}
 	}
 	return nil
