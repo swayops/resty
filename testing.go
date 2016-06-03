@@ -56,7 +56,7 @@ func compareRes(a, b []byte) error {
 
 	for k, v := range bm {
 		if ov := am[k]; !reflect.DeepEqual(v, ov) {
-			return fmt.Errorf("wanted %v, got %v", v, ov)
+			return fmt.Errorf("%s wanted %v, got %v", k, v, ov)
 		}
 	}
 	return nil
