@@ -53,15 +53,10 @@ func compareRes(a, b []byte) error {
 	if err := json.Unmarshal(b, &bm); err != nil {
 		return fmt.Errorf("%s: %v", b, err)
 	}
-	if len(am) == len(bm) {
-		if !reflect.DeepEqual(am, bm) {
-			return fmt.Errorf("%s != %s", a, b)
-		}
-	} else {
-		for k, v := range bm {
-			if ov := am[k]; !reflect.DeepEqual(v, ov) {
-				return fmt.Errorf("wanted %v, got %v", v, ov)
-			}
+
+	for k, v := range bm {
+		if ov := am[k]; !reflect.DeepEqual(v, ov) {
+			return fmt.Errorf("wanted %v, got %v", v, ov)
 		}
 	}
 	return nil
