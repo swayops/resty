@@ -1,6 +1,7 @@
 package resty
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,6 +13,8 @@ import (
 var (
 	LogRequests = false
 )
+
+type PartialMatch []byte
 
 type TestRequest struct {
 	Method string
@@ -38,6 +41,12 @@ func (tr *TestRequest) Run(t *testing.T, c *Client) {
 	case tr.ExpectedStatus == 0 && r.Status != 200, r.Status != tr.ExpectedStatus:
 		t.Fatalf("%s: wanted %d, got %d: %s", tr.String(), tr.ExpectedStatus, r.Status, r.Value)
 	case tr.ExpectedData != nil:
+		if ev, ok := tr.ExpectedData.(PartialMatch); ok {
+			if bytes.Index(r.Value, []byte(ev)) == -1 {
+				t.Fatalf("%s: partial mismatched, wanted %s, got: %s", tr.String(), ev, r.Value)
+			}
+			return
+		}
 		if err := compareRes(r.Value, getVal(tr.ExpectedData)); err != nil {
 			t.Fatalf("%s: %v", tr.String(), err)
 		}
