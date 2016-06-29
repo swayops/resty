@@ -83,7 +83,7 @@ func cmp(a, b interface{}) error {
 			if okcount == len(b) {
 				return nil
 			}
-			return fmt.Errorf("value mismatch: a = %v, b = %v", a, b)
+			return fmt.Errorf("not all expected values were found: a = %v, b = %v", a, b)
 
 		case map[string]interface{}:
 			var err error
