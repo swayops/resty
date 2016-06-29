@@ -115,6 +115,10 @@ func cmpMap(am, bm map[string]interface{}) error {
 			} else {
 				return fmt.Errorf("%s: type mismatch %T vs %T", k, am[k], bm[k])
 			}
+		case []interface{}:
+			if err := cmp(ov, v); err != nil {
+				return err
+			}
 		default:
 			if !reflect.DeepEqual(v, ov) {
 				return fmt.Errorf("%s wanted %v, got %v", k, v, ov)
