@@ -59,12 +59,21 @@ func compareRes(a, b []byte) error {
 
 func cmp(a, b interface{}) error {
 	switch a := a.(type) {
-	case []map[string]interface{}:
+	case []interface{}:
+		amap := make([]map[string]interface{}, len(a))
+		for i, v := range a {
+			amap[i], _ = v.(map[string]interface{})
+		}
+
 		switch b := b.(type) {
-		case []map[string]interface{}:
+		case []interface{}:
+			bmap := make([]map[string]interface{}, len(b))
+			for i, v := range b {
+				bmap[i], _ = v.(map[string]interface{})
+			}
 			var okcount int
-			for _, av := range a {
-				for _, bv := range b {
+			for _, av := range amap {
+				for _, bv := range bmap {
 					if cmpMap(av, bv) == nil {
 						okcount++
 						break
@@ -78,7 +87,7 @@ func cmp(a, b interface{}) error {
 
 		case map[string]interface{}:
 			var err error
-			for _, av := range a {
+			for _, av := range amap {
 				if err = cmpMap(av, b); err == nil {
 					break
 				}
