@@ -46,7 +46,7 @@ func (tr *TestRequest) Run(t *testing.T, c *Client) {
 
 // a == result, b == expected
 func compareRes(a, b []byte) error {
-	var am, bm map[string]interface{}
+	var am, bm interface{}
 	if err := json.Unmarshal(a, &am); err != nil {
 		return fmt.Errorf("%s: %v", a, err)
 	}
@@ -54,7 +54,44 @@ func compareRes(a, b []byte) error {
 		return fmt.Errorf("%s: %v", b, err)
 	}
 
-	return cmpMap(am, bm)
+	return cmp(am, bm)
+}
+
+func cmp(a, b interface{}) error {
+	switch a := a.(type) {
+	case []map[string]interface{}:
+		switch b := b.(type) {
+		case []map[string]interface{}:
+			var okcount int
+			for _, av := range a {
+				for _, bv := range b {
+					if cmpMap(av, bv) == nil {
+						okcount++
+						break
+					}
+				}
+			}
+			if okcount == len(b) {
+				return nil
+			}
+			return fmt.Errorf("value mismatch: a = %v, b = %v", a, b)
+
+		case map[string]interface{}:
+			var err error
+			for _, av := range a {
+				if err = cmpMap(av, b); err == nil {
+					break
+				}
+			}
+			return err
+		}
+
+	case map[string]interface{}:
+		if b, ok := b.(map[string]interface{}); ok {
+			return cmpMap(a, b)
+		}
+	}
+	return fmt.Errorf("type mismatch, a = %T, b = %T", a, b)
 }
 
 func cmpMap(am, bm map[string]interface{}) error {
