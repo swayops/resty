@@ -14,6 +14,14 @@ var (
 	LogRequests = false
 )
 
+func (c *Client) DoTesting(tb testing.TB, method, path string, data interface{}, out interface{}) (r Reply) {
+	r = c.Do(method, path, data, out)
+	if LogRequests {
+		tb.Logf("%s %s: [%d] %s", method, path, r.Status, r.Value)
+	}
+	return
+}
+
 type PartialMatch []byte
 
 type TestRequest struct {
@@ -29,7 +37,7 @@ func (tr *TestRequest) String() string {
 	return tr.Method + " " + tr.Path
 }
 
-func (tr *TestRequest) Run(t *testing.T, c *Client) {
+func (tr *TestRequest) Run(t testing.TB, c *Client) {
 	r := c.Do(tr.Method, tr.Path, tr.Data, nil)
 	if LogRequests {
 		t.Logf("%s: %s", tr.String(), r.Value)
