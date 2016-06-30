@@ -25,13 +25,13 @@ func (r *Reply) Unmarshal(v interface{}) error {
 
 type Client struct {
 	HTTPClient  http.Client
-	BasaeURL    string
+	BaseURL     string
 	ContentType string
 }
 
 func NewClient(baseURL string) *Client {
 	c := &Client{
-		BasaeURL:    baseURL,
+		BaseURL:     baseURL,
 		ContentType: "application/json",
 	}
 	c.Reset()
@@ -45,7 +45,7 @@ func (c *Client) GetFullURL(subPath string) (*url.URL, error) {
 		return url.Parse(subPath)
 	}
 
-	u, err := url.Parse(c.BasaeURL + "/" + subPath)
+	u, err := url.Parse(c.BaseURL + "/" + subPath)
 	if u != nil {
 		u.Path = re.ReplaceAllString(u.Path, "/")
 	}
@@ -91,6 +91,7 @@ func (c *Client) Do(method, path string, data interface{}, out interface{}) (r R
 	if resp, r.Err = c.HTTPClient.Do(req); r.Err != nil {
 		return
 	}
+
 	defer resp.Body.Close()
 	r.Status, r.Header = resp.StatusCode, resp.Header
 	if r.Value, r.Err = ioutil.ReadAll(resp.Body); r.Err != nil {
