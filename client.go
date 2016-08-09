@@ -17,6 +17,7 @@ type Reply struct {
 	Status int
 	Header http.Header
 	Value  []byte
+	URL    string
 }
 
 func (r *Reply) Unmarshal(v interface{}) error {
@@ -100,6 +101,8 @@ func (c *Client) Do(method, path string, data interface{}, out interface{}) (r R
 	if out != nil {
 		r.Err = r.Unmarshal(out)
 	}
+
+	r.URL = resp.Request.URL.String()
 	return
 }
 
