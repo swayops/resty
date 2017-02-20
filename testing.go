@@ -17,6 +17,9 @@ var (
 func (c *Client) DoTesting(tb testing.TB, method, path string, data interface{}, out interface{}) (r Reply) {
 	r = c.Do(method, path, data, out)
 	if LogRequests {
+		if len(string(r.Value)) > 5000 {
+			r.Value = r.Value[0:5000]
+		}
 		tb.Logf("%s %s: [%d] %s", method, path, r.Status, r.Value)
 	}
 	return
