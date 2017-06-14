@@ -106,6 +106,31 @@ func (c *Client) Do(method, path string, data interface{}, out interface{}) (r R
 	return
 }
 
+func (c *Client) RawDo(method, path string) (*http.Response, error) {
+	var (
+		u   *url.URL
+		err error
+	)
+	if u, err = c.GetFullURL(path); err != nil {
+		return nil, err
+	}
+
+	var (
+		req *http.Request
+	)
+
+	if req, err = http.NewRequest(method, u.String(), nil); err != nil {
+		return nil, err
+	}
+
+	var resp *http.Response
+	if resp, err = c.HTTPClient.Do(req); err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
 func (c *Client) Reset() {
 	c.HTTPClient.Jar, _ = cookiejar.New(nil)
 }
